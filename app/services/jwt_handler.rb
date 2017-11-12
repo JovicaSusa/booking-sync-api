@@ -7,7 +7,7 @@ class JwtHandler
 
   def self.decode(token)
     decoded_token = JWT.decode(token, HMAC_SECRET)[0]
-    HashWithIndiferentAccess.new(decoded_token)
+    HashWithIndifferentAccess.new(decoded_token)
     # TODO: Add error handling
   end
 end
