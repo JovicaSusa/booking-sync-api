@@ -2,6 +2,8 @@ require 'rails_helper'
 
 RSpec.describe 'Users API' do
   describe '#create' do
+    let(:user) { create(:user) }
+    let(:header) { { 'Authorization' => JwtHandler.encode(user_id: user.id) } }
     let(:valid_attrs) do
       {
         data: {
@@ -21,7 +23,7 @@ RSpec.describe 'Users API' do
     end.to_json
 
     context 'when valid attributes' do
-      before { post '/users', params: valid_attrs }
+      before { post '/users', params: valid_attrs, headers: header }
 
       it 'returns a new user' do
         json_response = JSON.parse(response.body)
@@ -35,7 +37,7 @@ RSpec.describe 'Users API' do
     end
 
     context 'when invalid attributes' do
-      before { post '/users', params: invalid_attrs }
+      before { post '/users', params: invalid_attrs, headers: header }
 
       xit 'returns response with :unprocessable_entity status' do
         # TODO Implement
