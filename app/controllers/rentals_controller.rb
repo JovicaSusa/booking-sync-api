@@ -1,4 +1,5 @@
 class RentalsController < ApplicationController
+  skip_before_action :authorize_request, except: [:create, :update, :destroy]
   before_action :set_rental, only: [:show, :update, :destroy]
 
   def index
@@ -7,15 +8,18 @@ class RentalsController < ApplicationController
   end
 
   def show
-    render json: @rental, status: :ok
+    render json: @rental, include: ['bookings'], status: :ok
     # TODO: Handle ActiveRecordNotFound situation
   end
 
   def create
     rental = Rental.new(rental_params)
-    rental.save
-    render json: rental, status: :created
-    # TODO: Handle create fail
+    if rental.save
+      render json: rental, status: :created
+    else
+      render json: { errors: ErrorSerializer.serialize(rental) },
+        status: :unprocessable_entity
+    end
   end
 
   def update

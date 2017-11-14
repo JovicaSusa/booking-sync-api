@@ -13,9 +13,12 @@ class BookingsController < ApplicationController
 
   def create
     booking = Booking.new(booking_params)
-    booking.save
-    render json: booking, status: :created
-    # TODO: Handle create fail
+    if booking.save
+      render json: booking, status: :created
+    else
+      render json: { errors: ErrorSerializer.serialize(booking) },
+        status: :unprocessable_entity
+    end
   end
 
   def update

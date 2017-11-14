@@ -1,9 +1,12 @@
 class UsersController < ApplicationController
   def create
     user = User.new(user_params)
-    # TODO Add error scenario
-    user.save
-    render json: user, status: :created
+    if user.save
+      render json: user, status: :created
+    else
+      render json: { errors: ErrorSerializer.serialize(user) },
+        status: :unprocessable_entity
+    end
   end
 
   private
