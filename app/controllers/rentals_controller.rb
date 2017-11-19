@@ -9,7 +9,6 @@ class RentalsController < ApplicationController
 
   def show
     render json: @rental, include: ['bookings'], status: :ok
-    # TODO: Handle ActiveRecordNotFound situation
   end
 
   def create

@@ -8,7 +8,6 @@ class BookingsController < ApplicationController
 
   def show
     render json: @booking, status: :ok
-    # TODO: Handle ActiveRecordNotFound situation
   end
 
   def create

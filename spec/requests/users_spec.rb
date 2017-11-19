@@ -39,12 +39,13 @@ RSpec.describe 'Users API' do
     context 'when invalid attributes' do
       before { post '/users', params: invalid_attrs, headers: header }
 
-      xit 'returns response with :unprocessable_entity status' do
-        # TODO Implement
+      it 'returns error object' do
+        response_json = JSON.parse(response.body)
+        expect(response_json['errors']).not_to be_empty
       end
 
-      xit 'returns error message' do
-        # TODO Implement
+      it 'returns response with status unprocessable_entity' do
+        expect(response).to have_http_status(422)
       end
     end
   end

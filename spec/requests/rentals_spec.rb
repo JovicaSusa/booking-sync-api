@@ -21,9 +21,9 @@ RSpec.describe 'Rentals API' do
   end
 
   describe 'GET /rentals/:id' do
-    before { get "/rentals/#{rental_id}", headers: header }
-
     context 'when rental exists' do
+      before { get "/rentals/#{rental_id}", headers: header }
+
       it 'returns requested rental' do
         json_response = JSON.parse(response.body)
         expect(json_response['data']['id'].to_i).to eq(rental_id)
@@ -35,7 +35,16 @@ RSpec.describe 'Rentals API' do
     end
 
     context 'when rental does not exist' do
-      # TODO: Implement
+      before { get "/rentals/#{rental_id + 100}", headers: header }
+
+      it 'returns error object' do
+        response_json = JSON.parse(response.body)
+        expect(response_json['errors']).not_to be_empty
+      end
+
+      it 'returns status :not_found code' do
+        expect(response).to have_http_status(404)
+      end
     end
   end
 
@@ -72,7 +81,16 @@ RSpec.describe 'Rentals API' do
     end
 
     context 'when not valid attributes' do
-      # TODO: Implement
+      before { post '/rentals', params: invalid_attrs, headers: header }
+
+      it 'returns error object' do
+        response_json = JSON.parse(response.body)
+        expect(response_json['errors']).not_to be_empty
+      end
+
+      it 'returns response with status unprocessable_entity' do
+        expect(response).to have_http_status(422)
+      end
     end
   end
 

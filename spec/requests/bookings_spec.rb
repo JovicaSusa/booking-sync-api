@@ -22,9 +22,9 @@ RSpec.describe 'Bookings API' do
   end
 
   describe 'GET /bookings/:id' do
-    before { get "/bookings/#{booking_id}", headers: header }
-
     context 'when booking exists' do
+      before { get "/bookings/#{booking_id}", headers: header }
+
       it 'returns requested booking' do
         json_response = JSON.parse(response.body)
         expect(json_response['data']['id'].to_i).to eq(booking_id)
@@ -36,7 +36,16 @@ RSpec.describe 'Bookings API' do
     end
 
     context 'when booking does not exist' do
-      # TODO: Implement
+      before { get "/bookings/#{booking_id + 100}", headers: header }
+
+      it 'returns error object' do
+        response_json = JSON.parse(response.body)
+        expect(response_json['errors']).not_to be_empty
+      end
+
+      it 'returns status :not_found code' do
+        expect(response).to have_http_status(404)
+      end
     end
   end
 
@@ -45,6 +54,23 @@ RSpec.describe 'Bookings API' do
       {
         data: {
           attributes: attributes_for(:booking),
+          relationships: {
+            rental: {
+              data: attributes_for(:rental).merge(id: rental.id)
+            }
+          }
+        }
+      }
+    end
+    let(:invalid_attrs) do
+      {
+        data: {
+          attributes: {
+            start_at: "2017-11-12 11:48:52",
+            end_at: "2017-11-12 11:48:52",
+            client_email: "",
+            price: "9.99"
+          },
           relationships: {
             rental: {
               data: attributes_for(:rental).merge(id: rental.id)
@@ -68,7 +94,16 @@ RSpec.describe 'Bookings API' do
     end
 
     context 'when not valid attributes' do
-      # TODO: Implement
+      before { post '/bookings', params: invalid_attrs, headers: header }
+
+      it 'returns error object' do
+        response_json = JSON.parse(response.body)
+        expect(response_json['errors']).not_to be_empty
+      end
+
+      it 'returns response with status unprocessable_entity' do
+        expect(response).to have_http_status(422)
+      end
     end
   end
 
