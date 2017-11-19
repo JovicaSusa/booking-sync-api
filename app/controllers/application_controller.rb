@@ -1,6 +1,4 @@
 class ApplicationController < ActionController::API
-  include ErrorSerializer
-
   before_action :authorize_request
 
   private

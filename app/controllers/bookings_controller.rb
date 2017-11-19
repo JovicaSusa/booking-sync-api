@@ -16,8 +16,9 @@ class BookingsController < ApplicationController
     if booking.save
       render json: booking, status: :created
     else
-      render json: { errors: ErrorSerializer.serialize(booking) },
-        status: :unprocessable_entity
+      render json: booking,
+        status: :unprocessable_entity,
+        serializer: ActiveModel::Serializer::ErrorSerializer
     end
   end
 

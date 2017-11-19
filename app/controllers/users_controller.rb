@@ -6,8 +6,9 @@ class UsersController < ApplicationController
     if user.save
       render json: user, status: :created
     else
-      render json: { errors: ErrorSerializer.serialize(user) },
-        status: :unprocessable_entity
+      render json: user,
+        status: :unprocessable_entity,
+        serializer: ActiveModel::Serializer::ErrorSerializer
     end
   end
 

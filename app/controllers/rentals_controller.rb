@@ -17,8 +17,9 @@ class RentalsController < ApplicationController
     if rental.save
       render json: rental, status: :created
     else
-      render json: { errors: ErrorSerializer.serialize(rental) },
-        status: :unprocessable_entity
+      render json: rental,
+        status: :unprocessable_entity,
+        serializer: ActiveModel::Serializer::ErrorSerializer
     end
   end
 
