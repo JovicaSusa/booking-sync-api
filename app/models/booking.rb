@@ -4,13 +4,20 @@ class Booking < ApplicationRecord
   MIN_STAY = 1
 
   validates_presence_of :start_at, :end_at, :client_email, :price, :rental
-  validate :validate_overlap
-  validate :validate_period
+  validate :validate_overlap,
+    unless: Proc.new { |booking| booking.rental.nil? }
+  validate :validate_period,
+    if: Proc.new { |booking| booking.start_at && booking.end_at  }
 
   private
 
   def validate_overlap
-    possible_overlap = rental.bookings.any? { |booking| check_overlap(booking) }
+    possible_overlap = rental.bookings.
+      select { |booking| booking.id != id }.
+      any? do |booking|
+        start_at > booking.start_at && start_at < booking.end_at ||
+        booking.start_at > start_at && booking.start_at < end_at
+      end
 
     if possible_overlap
       errors.add(:start_at, 'Rental is already booked for this date')
@@ -25,10 +32,5 @@ class Booking < ApplicationRecord
       errors.add(:start_at, 'Booking period must be at least one/night day')
       errors.add(:end_at, 'Booking period must be at least one/night day')
     end
-  end
-
-  def check_overlap(booking)
-    start_at > booking.start_at && start_at < booking.end_at ||
-    booking.start_at > start_at && booking.start_at < end_at
   end
 end
