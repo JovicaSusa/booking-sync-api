@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe 'Bookings API' do
-  let!(:bookings) { create_list(:booking, 10) }
+  let!(:bookings) { create_list(:booking, 5) }
   let(:booking_id) { bookings.first.id }
   let(:rental) { create(:rental) }
   let(:user) { create(:user) }
@@ -12,7 +12,7 @@ RSpec.describe 'Bookings API' do
 
     it 'returns the list of bookings' do
       json_response = JSON.parse(response.body)
-      expect(json_response['data'].length).to eq(10)
+      expect(json_response['data'].length).to eq(5)
     end
 
     it 'returns status code 200' do
@@ -108,15 +108,17 @@ RSpec.describe 'Bookings API' do
   end
 
   describe 'PUT /bookings/:id' do
+      let(:booking_for_update) { Booking.find(booking_id) }
       let(:update_attrs) do
         {
           data: {
             attributes: {
-              start_at: "2018-11-12 11:48:52"
+              start_at: booking_for_update.end_at - 3.days
             }
           }
         }
       end
+
       before { patch "/bookings/#{booking_id}", params: update_attrs, headers: header }
 
       it 'updates the booking' do
